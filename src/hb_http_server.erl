@@ -153,7 +153,12 @@ new_server(RawNodeMsg) ->
     % Put server ID into node message so it's possible to update current server
     % params
     NodeMsgWithID = hb_maps:put(http_server, ServerID, NodeMsg),
-    Dispatcher = cowboy_router:compile([{'_', [{'_', ?MODULE, ServerID}]}]),
+    Dispatcher = cowboy_router:compile([
+        {'_', [
+            {"/ws", hb_websocket_handler, []},
+            {'_', ?MODULE, ServerID}
+        ]}
+    ]),
     ProtoOpts = #{
         env => #{dispatch => Dispatcher, node_msg => NodeMsgWithID},
         stream_handlers => [cowboy_stream_h],
